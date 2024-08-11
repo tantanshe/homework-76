@@ -13,7 +13,7 @@ const fileDb = {
     }
   },
   async getMessages() {
-    return data;
+    return data.slice(-30);
   },
   async addMessage(item: Message) {
     const id = crypto.randomUUID();
@@ -22,13 +22,13 @@ const fileDb = {
       id,
       ...item,
       datetime
-    }
+    };
     data.push(message);
     await this.save();
     return message;
   },
   async save() {
-    await fs.writeFile(fileName, JSON.stringify(data));
+    await fs.writeFile(fileName, JSON.stringify(data, null, 2));
   }
 };
 

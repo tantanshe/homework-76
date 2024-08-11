@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import fileDb from './fileDb';
 import messagesRouter from './routers/messages';
 import cors, {CorsOptions} from 'cors';
@@ -12,21 +12,21 @@ const corsOptions: CorsOptions = {
     if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   }
-}
+};
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use('/messages', messagesRouter)
+app.use('/messages', messagesRouter);
 
 const run = async () => {
   await fileDb.init();
 
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-  })
-}
+  });
+};
 
 run().catch(console.error);
