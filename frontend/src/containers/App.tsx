@@ -9,17 +9,11 @@ const url = 'http://localhost:8000/messages';
 
 const App = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [intervalMsg, setIntervalMsg] = useState<number | null>(null);
 
-  const fetchMessages = async (datetime?: string) => {
+  const fetchMessages = async () => {
     try {
-      const response = await axios.get<Message[]>(url, {
-        params: datetime ? {datetime} : {},
-      });
-      setMessages((prev) => {
-        const newMessages = datetime ? [...prev, ...response.data] : response.data;
-        return newMessages.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
-      });
+      const response = await axios.get<Message[]>(url);
+      setMessages(response.data.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()));
     } catch (error) {
       console.error('Error fetching messages', error);
     }
@@ -29,21 +23,18 @@ const App = () => {
     void fetchMessages();
 
     const newIntervalMsg = setInterval(() => {
-      const lastMessage = messages[messages.length - 1];
-      void fetchMessages(lastMessage?.datetime);
+      void fetchMessages();
     }, 3000);
-    setIntervalMsg(newIntervalMsg);
 
     return () => {
-      if (intervalMsg) {
-        clearInterval(intervalMsg);
-      }
+      clearInterval(newIntervalMsg);
     };
-  }, [messages]);
+  }, []);
 
   const handleSendMessage = async (message: string, author: string) => {
     try {
       await axios.post(url, {message, author});
+      void fetchMessages();
     } catch (error) {
       console.error('Error sending message', error);
     }
